@@ -3,120 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kstreakzz</title>
-    <link rel="stylesheet" href="style.css">
+    <title>KSTREAKBOX // VIOLET-CMD</title>
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #06030e;
+            --glass: rgba(18, 10, 35, 0.7);
+            --glass-bright: rgba(45, 25, 80, 0.5);
+            --border: rgba(168, 85, 247, 0.3);
+            --primary: #bc61ff;
+            --primary-glow: #bc61ff66;
+            --secondary: #ec4899;
+            --accent: #22d3ee;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: default; }
+
+        body {
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(188, 97, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(34, 211, 238, 0.1) 0px, transparent 50%);
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- SMOOTH CRT EFFECT --- */
+        body::before {
+            content: " ";
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none; z-index: 1000;
+        }
+
+        /* --- AUTH SCREEN --- */
+        .auth-overlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px); transition: 0.5s ease-out;
+        }
+        .auth-overlay.hidden { opacity: 0; pointer-events: none; transform: scale(1.05); }
+
+        .auth-card {
+            width: 380px; padding: 40px; border-radius: 24px;
+            background: var(--glass); border: 1px solid var(--border);
+            box-shadow: 0 0 50px var(--primary-glow);
+            text-align: center;
+        }
+
+        .input-field {
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 14px; border-radius: 12px; color: white; margin-bottom: 15px;
+            font-family: 'JetBrains Mono'; transition: 0.2s;
+        }
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); outline: none; }
+
+        .btn-glow {
+            width: 100%; padding: 14px; border-radius: 12px; border: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; font-weight: 700; font-family: 'Space Grotesk';
+            cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 5px 20px var(--primary-glow); }
+
+        /* --- APP FLOW --- */
+        .header {
+            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+            background: var(--glass); border-bottom: 1px solid var(--border);
+        }
+
+        .brand { font-size: 1.5rem; font-weight: 700; letter-spacing: -1px; }
+        .brand span { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+
+        .nav-stats { display: flex; gap: 30px; }
+        .stat-item { display: flex; flex-direction: column; align-items: flex-end; }
+        .stat-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
+        .stat-value { font-family: 'JetBrains Mono'; font-weight: 700; color: var(--accent); }
+
+        /* Dashboard Grid */
+        .dashboard {
+            display: grid; grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 20px; padding: 20px 40px; height: 180px;
+        }
+
+        .glass-card {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 20px; padding: 15px; display: flex; flex-direction: column;
+            transition: 0.3s;
+        }
+        .glass-card:hover { border-color: var(--primary); background: var(--glass-bright); }
+
+        /* Chart Elements */
+        .pie-wrap { position: relative; width: 80px; height: 80px; margin: auto; }
+        .pie-svg { transform: rotate(-90deg); }
+        .pie-bg { fill: none; stroke: var(--border); stroke-width: 4; }
+        .pie-fill { fill: none; stroke: var(--primary); stroke-width: 4; stroke-linecap: round; transition: 1s; }
+
+        .bar-wrap { display: flex; align-items: flex-end; gap: 6px; height: 100%; justify-content: center; }
+        .bar-pill { flex: 1; background: var(--primary); border-radius: 4px; min-height: 4px; transition: 0.4s; }
+
+        /* Table Control */
+        .controls { padding: 0 40px 10px; display: flex; gap: 15px; }
+        
+        .main-frame {
+            flex: 1; margin: 0 40px 20px; background: var(--glass);
+            border: 1px solid var(--border); border-radius: 24px; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        .table-scroll { overflow: auto; flex: 1; scroll-behavior: smooth; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { 
+            position: sticky; top: 0; background: #160d2b; padding: 15px; 
+            font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;
+            text-align: center; z-index: 10; border-bottom: 1px solid var(--border);
+        }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); text-align: center; }
+
+        .sticky-date {
+            position: sticky; left: 0; background: #120a23; 
+            z-index: 5; border-right: 1px solid var(--border); text-align: left !important;
+            padding-left: 20px; font-weight: 700;
+        }
+
+        /* Checkbox Upgrade */
+        .check-container {
+            display: inline-block; position: relative; width: 22px; height: 22px;
+            cursor: pointer;
+        }
+        .check-container input { display: none; }
+        .checkmark {
+            position: absolute; inset: 0; border: 2px solid var(--border);
+            border-radius: 6px; transition: 0.2s;
+        }
+        .check-container:hover .checkmark { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+        .check-container input:checked + .checkmark {
+            background: var(--primary); border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+        .check-container input:checked + .checkmark::after {
+            content: '✓'; color: white; position: absolute; left: 4px; top: -2px; font-weight: 900;
+        }
+
+        .row-perc { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-muted); }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    </style>
 </head>
 <body>
 
-    <!-- AUTHENTICATION SCREEN (Login/Signup) -->
-    <div id="auth-screen" class="auth-container">
-        <div class="auth-box">
-            
-            <!-- Branding -->
-            <div class="auth-header">
-                <div class="logo-box">◼</div>
-                <h1>K<b>STREAKBOX</b></h1>
-                <p>Secure Task Environment</p>
-            </div>
-
-            <!-- Login Form -->
-            <form id="login-form" class="auth-form active">
-                <div class="input-group">
-                    <label>Operator ID (Email)</label>
-                    <input type="email" id="login-email" placeholder="user@gmail.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Access Code</label>
-                    <input type="password" id="login-pass" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="auth-btn">AUTHENTICATE</button>
-                <div class="auth-footer">
-                    <span>New Recruit?</span>
-                    <a href="#" id="to-signup">Initialize Protocol</a>
-                </div>
-            </form>
-
-            <!-- Signup Form -->
-            <form id="signup-form" class="auth-form">
-                <div class="input-group">
-                    <label>Set Operator Name</label>
-                    <input type="text" id="signup-name" placeholder="e.g. Ghost" required>
-                </div>
-                <div class="input-group">
-                    <label>Set Email</label>
-                    <input type="email" id="signup-email" placeholder="user@gmail.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Set Access Code</label>
-                    <input type="password" id="signup-pass" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="auth-btn">ESTABLISH ID</button>
-                <div class="auth-footer">
-                    <span>Existing Operator?</span>
-                    <a href="#" id="to-login">Return to Login</a>
-                </div>
-            </form>
-
+    <!-- AUTH -->
+    <div id="auth-screen" class="auth-overlay">
+        <div class="auth-card">
+            <h2 class="brand" style="margin-bottom: 30px;">KSTREAK<span>BOX</span></h2>
+            <input type="text" id="auth-name" class="input-field" placeholder="OPERATOR CALLSIGN">
+            <input type="email" id="auth-email" class="input-field" placeholder="SECURE EMAIL">
+            <input type="password" id="auth-pass" class="input-field" placeholder="ACCESS KEYCODE">
+            <button onclick="handleAuth()" class="btn-glow">Initialize System</button>
+            <p id="auth-toggle" style="margin-top: 15px; font-size: 0.8rem; color: var(--text-muted); cursor: pointer;">
+                Existing user? <span style="color: var(--primary)">Login</span>
+            </p>
         </div>
     </div>
 
-    <!-- MAIN APP DASHBOARD (Hidden until logged in) -->
-    <div id="app-screen" class="container hidden">
-        <!-- HEADER -->
-        <header>
-            <div class="header-left">
-                <div class="logo-box">◼</div>
-                <div>
-                    <h1>K<b>STREAKBOX</b></h1>
-                    <small>Welcome, <span id="user-display">Operator</span></small>
-                </div>
+    <!-- MAIN APP -->
+    <header class="header">
+        <div class="brand">KSTREAK<span>BOX</span></div>
+        <div class="nav-stats">
+            <div class="stat-item">
+                <span class="stat-label">Supreme Streak</span>
+                <span class="stat-value" id="streak-val">0 DAYS</span>
             </div>
-            <div class="header-right">
-                <button id="logout-btn" class="btn-text">LOGOUT</button>
+            <div class="stat-item">
+                <span class="stat-label">Operator Level</span>
+                <span class="stat-value" id="lvl-val">LVL 1</span>
             </div>
-        </header>
+            <button onclick="logout()" class="logout-btn" style="background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 10px; border-radius: 8px; font-size: 0.6rem; cursor: pointer;">EXIT</button>
+        </div>
+    </header>
 
-        <!-- CHARTS SECTION -->
-        <section class="charts-dashboard">
-            <div class="chart-card">
-                <div class="card-title">Completion Rate</div>
-                <div class="pie-container">
-                    <div class="pie-chart" id="pie-chart"></div>
-                    <div class="pie-overlay"><span id="pie-value">0%</span></div>
-                </div>
+    <section class="dashboard">
+        <div class="glass-card">
+            <span class="stat-label">Core Integrity</span>
+            <div class="pie-wrap">
+                <svg class="pie-svg" viewBox="0 0 36 36">
+                    <circle class="pie-bg" cx="18" cy="18" r="15.9"></circle>
+                    <circle id="pie-fill" class="pie-fill" cx="18" cy="18" r="15.9" stroke-dasharray="0, 100"></circle>
+                </svg>
+                <div id="pie-perc" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono'; font-weight: 700;">0%</div>
             </div>
-            <div class="chart-card wide-card">
-                <div class="card-title">30-Day Trend</div>
-                <div class="line-chart-container" id="line-chart-wrapper"></div>
-            </div>
-            <div class="chart-card wide-card">
-                <div class="card-title">Habit Performance</div>
-                <div class="bar-chart-container" id="bar-chart-wrapper"></div>
-            </div>
-        </section>
-
-        <!-- INPUT SECTION -->
-        <div class="control-panel">
-            <input type="text" id="task-input" placeholder="Initialize new protocol..." maxlength="15">
-            <button id="add-btn">EXECUTE</button>
         </div>
 
-        <!-- DATA TABLE -->
-        <div class="table-frame">
-            <div class="table-scroll">
-                <table id="tracker-table">
-                    <thead>
-                        <tr id="header-row">
-                            <th class="fixed-col">Timeline</th>
-                            <th class="end-col">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body"></tbody>
-                </table>
-            </div>
+        <div class="glass-card">
+            <span class="stat-label">Performance Pulse (30 Days)</span>
+            <svg id="line-svg" viewBox="0 0 300 100" style="width:100%; height:80px; margin-top: 10px;">
+                <path id="line-path" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round"></path>
+                <path id="area-path" fill="var(--primary-glow)"></path>
+            </svg>
+        </div>
+
+        <div class="glass-card">
+            <span class="stat-label">Protocol Strength</span>
+            <div class="bar-wrap" id="bar-chart"></div>
+        </div>
+    </section>
+
+    <div class="controls">
+        <input type="text" id="task-input" class="input-field" style="margin-bottom:0; flex:1;" placeholder="Define New Protocol...">
+        <button onclick="addTask()" class="btn-glow" style="width: auto; padding: 0 30px;">Activate</button>
+        <input type="date" id="start-date" class="input-field" style="margin-bottom:0; width: 180px;">
+    </div>
+
+    <div class="main-frame">
+        <div class="table-scroll">
+            <table id="main-table">
+                <thead><tr id="head-row"></tr></thead>
+                <tbody id="table-body"></tbody>
+            </table>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        let users = JSON.parse(localStorage.getItem('ks_elite_users')) || {};
+        let session = localStorage.getItem('ks_elite_session');
+        let state = { tasks: [], logs: {}, startDate: new Date().toISOString().split('T')[0], xp: 0 };
+        let isLogin = false;
+
+        // --- AUTH ---
+        document.getElementById('auth-toggle').onclick = () => {
+            isLogin = !isLogin;
+            document.getElementById('auth-toggle').innerHTML = isLogin ? "New recruit? <span>Register</span>" : "Existing user? <span>Login</span>";
+            document.querySelector('.btn-glow').textContent = isLogin ? "Authorize Access" : "Initialize System";
+        };
+
+        function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            const name = document.getElementById('auth-name').value;
+
+            if (isLogin) {
+                if (users[email] && users[email].pass === pass) {
+                    session = email; localStorage.setItem('ks_elite_session', email);
+                    initApp();
+                } else alert("ACCESS DENIED");
+            } else {
+                if (users[email]) return alert("USER EXISTS");
+                users[email] = { name, pass, tasks: [], logs: {}, startDate: state.startDate, xp: 0 };
+                localStorage.setItem('ks_elite_users', JSON.stringify(users));
+                alert("IDENTITY ESTABLISHED. LOGIN NOW.");
+                document.getElementById('auth-toggle').click();
+            }
+        }
+
+        function logout() { localStorage.removeItem('ks_elite_session'); location.reload(); }
+
+        // --- CORE ---
+        function initApp() {
+            if (!session) return;
+            state = users[session];
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('start-date').value = state.startDate;
+            render();
+        }
+
+        function save() {
+            users[session] = state;
+            localStorage.setItem('ks_elite_users', JSON.stringify(users));
+            render();
+        }
+
+        function addTask() {
+            const val = document.getElementById('task-input').value.trim();
+            if (val && !state.tasks.includes(val)) {
+                state.tasks.push(val);
+                document.getElementById('task-input').value = '';
+                save();
+            }
+        }
+
+        function toggleLog(date, task) {
+            if (!state.logs[date]) state.logs[date] = {};
+            const checked = !state.logs[date][task];
+            state.logs[date][task] = checked;
+            state.xp += checked ? 10 : -10;
+            save();
+        }
+
+        // --- UI SPEED RENDER ---
+        function render() {
+            const dates = [];
+            let curr = new Date(state.startDate);
+            for(let i=0; i<30; i++) {
+                dates.push(new Date(curr).toISOString().split('T')[0]);
+                curr.setDate(curr.getDate() + 1);
+            }
+
+            let totalP = dates.length * state.tasks.length;
+            let totalD = 0;
+            let dailyPercs = [];
+            let taskEff = {};
+            state.tasks.forEach(t => taskEff[t] = 0);
+
+            let maxStreak = 0, currentS = 0;
+
+            dates.forEach(d => {
+                let dayD = 0;
+                state.tasks.forEach(t => {
+                    if (state.logs[d]?.[t]) { dayD++; totalD++; taskEff[t]++; }
+                });
+                let p = state.tasks.length ? (dayD / state.tasks.length) * 100 : 0;
+                dailyPercs.push(p);
+                if (p === 100 && state.tasks.length > 0) { currentS++; if(currentS > maxStreak) maxStreak = currentS; }
+                else currentS = 0;
+            });
+
+            // Update Stats
+            document.getElementById('streak-val').textContent = maxStreak + " DAYS";
+            document.getElementById('lvl-val').textContent = "LVL " + (Math.floor(state.xp/100) + 1);
+
+            // Pie
+            const coreP = totalP ? Math.round((totalD / totalP) * 100) : 0;
+            document.getElementById('pie-fill').setAttribute('stroke-dasharray', `${coreP}, 100`);
+            document.getElementById('pie-perc').textContent = coreP + "%";
+
+            // Pulse Chart
+            const pathData = dailyPercs.map((p, i) => `${i * 10.34},${100 - p}`).join(' L ');
+            document.getElementById('line-path').setAttribute('d', `M ${pathData}`);
+            document.getElementById('area-path').setAttribute('d', `M ${pathData} L 300,100 L 0,100 Z`);
+
+            // Bars
+            document.getElementById('bar-chart').innerHTML = state.tasks.map(t => {
+                const h = (taskEff[t] / 30) * 100;
+                return `<div class="bar-pill" style="height:${Math.max(h, 5)}%" title="${t}"></div>`;
+            }).join('');
+
+            // Table
+            document.getElementById('head-row').innerHTML = `<th class="sticky-date">TIMELINE</th>` + 
+                state.tasks.map(t => `<th>${t}</th>`).join('') + `<th>SYNC</th>`;
+
+            document.getElementById('table-body').innerHTML = dates.map(d => {
+                const dO = new Date(d);
+                let dayD = 0;
+                let checks = state.tasks.map(t => {
+                    const c = state.logs[d]?.[t] ? 'checked' : '';
+                    if(c) dayD++;
+                    return `<td><label class="check-container"><input type="checkbox" ${c} onchange="toggleLog('${d}','${t}')"><span class="checkmark"></span></label></td>`;
+                }).join('');
+                const p = state.tasks.length ? Math.round((dayD/state.tasks.length)*100) : 0;
+                return `<tr>
+                    <td class="sticky-date">
+                        <span style="color:var(--primary)">${dO.getDate()} ${dO.toLocaleDateString('en-US',{month:'short'})}</span>
+                        <small style="color:var(--text-muted); display:block; font-size:0.6rem;">${dO.toLocaleDateString('en-US',{weekday:'short'})}</small>
+                    </td>
+                    ${checks}
+                    <td class="row-perc" style="color:${p===100?'var(--accent)':'var(--text-muted)'}">${p}%</td>
+                </tr>`;
+            }).join('');
+        }
+
+        document.getElementById('start-date').onchange = (e) => {
+            state.startDate = e.target.value;
+            save();
+        };
+
+        if (session) initApp();
+    </script>
 </body>
 </html>
