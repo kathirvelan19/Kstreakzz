@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kstreakzz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- AUTHENTICATION SCREEN (Login/Signup) -->
+    <div id="auth-screen" class="auth-container">
+        <div class="auth-box">
+            
+            <!-- Branding -->
+            <div class="auth-header">
+                <div class="logo-box">◼</div>
+                <h1>K<b>STREAKBOX</b></h1>
+                <p>Secure Task Environment</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <div class="input-group">
+                    <label>Operator ID (Email)</label>
+                    <input type="email" id="login-email" placeholder="user@gmail.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Access Code</label>
+                    <input type="password" id="login-pass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="auth-btn">AUTHENTICATE</button>
+                <div class="auth-footer">
+                    <span>New Recruit?</span>
+                    <a href="#" id="to-signup">Initialize Protocol</a>
+                </div>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signup-form" class="auth-form">
+                <div class="input-group">
+                    <label>Set Operator Name</label>
+                    <input type="text" id="signup-name" placeholder="e.g. Ghost" required>
+                </div>
+                <div class="input-group">
+                    <label>Set Email</label>
+                    <input type="email" id="signup-email" placeholder="user@gmail.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Set Access Code</label>
+                    <input type="password" id="signup-pass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="auth-btn">ESTABLISH ID</button>
+                <div class="auth-footer">
+                    <span>Existing Operator?</span>
+                    <a href="#" id="to-login">Return to Login</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- MAIN APP DASHBOARD (Hidden until logged in) -->
+    <div id="app-screen" class="container hidden">
+        <!-- HEADER -->
+        <header>
+            <div class="header-left">
+                <div class="logo-box">◼</div>
+                <div>
+                    <h1>K<b>STREAKBOX</b></h1>
+                    <small>Welcome, <span id="user-display">Operator</span></small>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="logout-btn" class="btn-text">LOGOUT</button>
+            </div>
+        </header>
+
+        <!-- CHARTS SECTION -->
+        <section class="charts-dashboard">
+            <div class="chart-card">
+                <div class="card-title">Completion Rate</div>
+                <div class="pie-container">
+                    <div class="pie-chart" id="pie-chart"></div>
+                    <div class="pie-overlay"><span id="pie-value">0%</span></div>
+                </div>
+            </div>
+            <div class="chart-card wide-card">
+                <div class="card-title">30-Day Trend</div>
+                <div class="line-chart-container" id="line-chart-wrapper"></div>
+            </div>
+            <div class="chart-card wide-card">
+                <div class="card-title">Habit Performance</div>
+                <div class="bar-chart-container" id="bar-chart-wrapper"></div>
+            </div>
+        </section>
+
+        <!-- INPUT SECTION -->
+        <div class="control-panel">
+            <input type="text" id="task-input" placeholder="Initialize new protocol..." maxlength="15">
+            <button id="add-btn">EXECUTE</button>
+        </div>
+
+        <!-- DATA TABLE -->
+        <div class="table-frame">
+            <div class="table-scroll">
+                <table id="tracker-table">
+                    <thead>
+                        <tr id="header-row">
+                            <th class="fixed-col">Timeline</th>
+                            <th class="end-col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
